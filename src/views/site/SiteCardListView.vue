@@ -3,6 +3,7 @@ import draggable from 'vuedraggable'
 import api from '@/api'
 import type { Site, SiteUserData } from '@/api/types'
 import SiteCard from '@/components/cards/SiteCard.vue'
+import HyperSiteCard from '@/hyper/HyperSiteCard.vue'
 import NoDataFound from '@/components/NoDataFound.vue'
 import SiteAddEditDialog from '@/components/dialog/SiteAddEditDialog.vue'
 import SiteStatisticsDialog from '@/components/dialog/SiteStatisticsDialog.vue'
@@ -105,7 +106,7 @@ const currentFilter = computed(() => {
 async function fetchData() {
   try {
     loading.value = true
-    siteList.value = await api.get('site/')
+    siteList.value = await api.get('hyper_site/')
     loading.value = false
     isRefreshed.value = true
     // 获取站点列表后，获取统计数据
@@ -374,7 +375,7 @@ useDynamicButton({
       :disabled="filterOption !== 'all'"
     >
       <template #item="{ element }">
-        <SiteCard
+        <HyperSiteCard
           :site="element"
           :data="getUserData(element.domain)"
           :stats="getSiteStats(element.domain)"
