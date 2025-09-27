@@ -19,11 +19,11 @@ interface HyperSite {
   encoding?: string;
   is_public?: boolean;
   use_proxy?: boolean;
-  status: number; // 可考虑用 SiteStatus 枚举类型
+  status: SiteStatus; // 可考虑用 SiteStatus 枚举类型
   description?: string;
   created_at?: string; // ISO 8601 datetime string
   updated_at?: string;
-  search_configs?: SiteSearchConfig[];
+  search_configs: SiteSearchConfig[];
 }
 
 interface SiteSearchConfig {
@@ -50,4 +50,13 @@ interface SiteFieldMapping {
   default_value?: string;
   is_required?: boolean;
   description?: string;
+}
+export  {
+  ResponseType,
+  SiteStatus,
+}
+export type {
+  HyperSite,
+  SiteSearchConfig,
+  SiteFieldMapping,
 }

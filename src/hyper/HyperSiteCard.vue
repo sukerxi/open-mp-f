@@ -13,6 +13,7 @@ import { isNullOrEmptyObject } from '@/@core/utils'
 import { formatFileSize } from '@/@core/utils/formatters'
 import { useConfirm } from '@/composables/useConfirm'
 import { useDisplay } from 'vuetify'
+import { HyperSite } from '@/hyper/type'
 
 // 显示器宽度
 const display = useDisplay()
@@ -350,13 +351,13 @@ onMounted(() => {
     </VCard>
 
     <!-- 对话框组件 -->
-    <SiteCookieUpdateDialog
-      v-if="siteCookieDialog"
-      v-model="siteCookieDialog"
-      :site="cardProps.site"
-      @close="siteCookieDialog = false"
-      @done="onSiteCookieUpdated"
-    />
+<!--    <SiteCookieUpdateDialog-->
+<!--      v-if="siteCookieDialog"-->
+<!--      v-model="siteCookieDialog"-->
+<!--      :site="cardProps.site"-->
+<!--      @close="siteCookieDialog = false"-->
+<!--      @done="onSiteCookieUpdated"-->
+<!--    />-->
     <SiteAddEditDialog
       v-if="siteEditDialog"
       v-model="siteEditDialog"
@@ -365,18 +366,18 @@ onMounted(() => {
       @remove="emit('remove')"
       @close="siteEditDialog = false"
     />
-    <SiteUserDataDialog
-      v-if="siteUserDataDialog"
-      v-model="siteUserDataDialog"
-      :site="cardProps.site"
-      @close="siteUserDataDialog = false"
-    />
-    <SiteResourceDialog
-      v-if="resourceDialog"
-      v-model="resourceDialog"
-      :site="cardProps.site"
-      @close="onSiteResourceDone"
-    />
+<!--    <SiteUserDataDialog-->
+<!--      v-if="siteUserDataDialog"-->
+<!--      v-model="siteUserDataDialog"-->
+<!--      :site="cardProps.site"-->
+<!--      @close="siteUserDataDialog = false"-->
+<!--    />-->
+<!--    <SiteResourceDialog-->
+<!--      v-if="resourceDialog"-->
+<!--      v-model="resourceDialog"-->
+<!--      :site="cardProps.site"-->
+<!--      @close="onSiteResourceDone"-->
+<!--    />-->
   </div>
 </template>
 

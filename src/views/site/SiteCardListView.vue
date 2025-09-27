@@ -13,6 +13,7 @@ import { useDynamicButton } from '@/composables/useDynamicButton'
 import { useI18n } from 'vue-i18n'
 import { usePWA } from '@/composables/usePWA'
 import { useToast } from 'vue-toastification'
+import router from '@/router'
 
 // 国际化
 const { t } = useI18n()
@@ -191,6 +192,19 @@ function getUserData(domain: string) {
 // 根据站点域名获取统计数据
 function getSiteStats(domain: string) {
   return siteStatsList.value[domain] || {}
+}
+
+// 查看媒体详情
+function viewMediaDetail() {
+  router.push({
+    path: '/site_edit',
+    query: {
+      mediaid: getMediaId(),
+      title: props.media?.name,
+      year: props.media?.year,
+      type: props.media?.type,
+    },
+  })
 }
 
 // 处理站点统计数据刷新请求

@@ -117,6 +117,14 @@ const router = createRouter({
           },
         },
         {
+          path: '/site_edit/',
+          component: () => import('@/hyper/HyperSiteEdit.vue'),
+          meta: {
+            keepAlive: true,
+            requiresAuth: true,
+          },
+        },
+        {
           path: '/user',
           component: () => import('../pages/user.vue'),
           meta: {
