@@ -45,21 +45,21 @@
             <v-col cols="12" md="4">
               <v-switch
                 v-model="site.is_public"
-                label="Public"
+                label="公共"
                 inset
               ></v-switch>
             </v-col>
             <v-col cols="12" md="4">
               <v-switch
                 v-model="site.use_proxy"
-                label="Use Proxy"
+                label="使用代理"
                 inset
               ></v-switch>
             </v-col>
             <v-col cols="12" md="4">
               <v-text-field
                 v-model="site.encoding"
-                label="Encoding (e.g. UTF-8)"
+                label="编码 (例 UTF-8)"
               ></v-text-field>
             </v-col>
           </v-row>
