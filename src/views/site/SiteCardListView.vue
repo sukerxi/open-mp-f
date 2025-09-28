@@ -3,6 +3,7 @@ import draggable from 'vuedraggable'
 import api from '@/api'
 import type { Site, SiteUserData } from '@/api/types'
 import SiteCard from '@/components/cards/SiteCard.vue'
+import HyperSiteCard from '@/hyper/HyperSiteCard.vue'
 import NoDataFound from '@/components/NoDataFound.vue'
 import SiteAddEditDialog from '@/components/dialog/SiteAddEditDialog.vue'
 import SiteStatisticsDialog from '@/components/dialog/SiteStatisticsDialog.vue'
@@ -12,6 +13,7 @@ import { useDynamicButton } from '@/composables/useDynamicButton'
 import { useI18n } from 'vue-i18n'
 import { usePWA } from '@/composables/usePWA'
 import { useToast } from 'vue-toastification'
+import router from '@/router'
 
 // 国际化
 const { t } = useI18n()
@@ -105,7 +107,7 @@ const currentFilter = computed(() => {
 async function fetchData() {
   try {
     loading.value = true
-    siteList.value = await api.get('site/')
+    siteList.value = await api.get('hyper_site/')
     loading.value = false
     isRefreshed.value = true
     // 获取站点列表后，获取统计数据
@@ -190,6 +192,19 @@ function getUserData(domain: string) {
 // 根据站点域名获取统计数据
 function getSiteStats(domain: string) {
   return siteStatsList.value[domain] || {}
+}
+
+// 查看媒体详情
+function viewMediaDetail() {
+  router.push({
+    path: '/site_edit',
+    query: {
+      mediaid: getMediaId(),
+      title: props.media?.name,
+      year: props.media?.year,
+      type: props.media?.type,
+    },
+  })
 }
 
 // 处理站点统计数据刷新请求
@@ -374,7 +389,7 @@ useDynamicButton({
       :disabled="filterOption !== 'all'"
     >
       <template #item="{ element }">
-        <SiteCard
+        <HyperSiteCard
           :site="element"
           :data="getUserData(element.domain)"
           :stats="getSiteStats(element.domain)"
