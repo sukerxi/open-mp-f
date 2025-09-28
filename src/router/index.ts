@@ -117,7 +117,8 @@ const router = createRouter({
           },
         },
         {
-          path: '/site_edit/',
+          name: 'hyper_site_edit',
+          path: '/hyper_site_edit/:id',
           component: () => import('@/hyper/HyperSiteEdit.vue'),
           meta: {
             keepAlive: true,

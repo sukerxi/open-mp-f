@@ -3,7 +3,7 @@ import type { PropType } from 'vue'
 import { getLogoUrl } from '@/utils/imageUtils'
 import { useToast } from 'vue-toastification'
 import { useI18n } from 'vue-i18n'
-import SiteAddEditDialog from '@/components/dialog/SiteAddEditDialog.vue'
+import HyperSiteEdit from '@/hyper/HyperSiteEdit.vue'
 import SiteUserDataDialog from '@/components/dialog/SiteUserDataDialog.vue'
 import SiteResourceDialog from '@/components/dialog/SiteResourceDialog.vue'
 import SiteCookieUpdateDialog from '@/components/dialog/SiteCookieUpdateDialog.vue'
@@ -14,6 +14,7 @@ import { formatFileSize } from '@/@core/utils/formatters'
 import { useConfirm } from '@/composables/useConfirm'
 import { useDisplay } from 'vuetify'
 import { HyperSite } from '@/hyper/type'
+import { useRouter } from 'vue-router'
 
 // 显示器宽度
 const display = useDisplay()
@@ -108,6 +109,12 @@ async function handleSiteUserData() {
 // 打开站点页面
 function openSitePage() {
   window.open('https://'+cardProps.site?.domain, '_blank')
+}
+
+const router = useRouter()
+// 打开编辑页面
+function openSiteEdit(siteId: number | undefined) {
+  router.push({ name: 'hyper_site_edit', params: { id: siteId } });
 }
 
 // 调用API删除站点信息
@@ -332,7 +339,7 @@ onMounted(() => {
           <VIcon icon="mdi-dots-vertical" size="20" />
           <VMenu :activator="'parent'" :close-on-content-click="true" :location="'left'">
             <VList>
-              <VListItem @click="siteEditDialog = true" base-color="info">
+              <VListItem @click="openSiteEdit(site?.id)" base-color="info">
                 <template #prepend>
                   <VIcon icon="mdi-file-edit-outline" size="20" />
                 </template>
@@ -358,14 +365,14 @@ onMounted(() => {
 <!--      @close="siteCookieDialog = false"-->
 <!--      @done="onSiteCookieUpdated"-->
 <!--    />-->
-    <SiteAddEditDialog
-      v-if="siteEditDialog"
-      v-model="siteEditDialog"
-      :siteid="cardProps.site?.id"
-      @save="saveSite"
-      @remove="emit('remove')"
-      @close="siteEditDialog = false"
-    />
+<!--    <SiteAddEditDialog-->
+<!--      v-if="siteEditDialog"-->
+<!--      v-model="siteEditDialog"-->
+<!--      :siteid="cardProps.site?.id"-->
+<!--      @save="saveSite"-->
+<!--      @remove="emit('remove')"-->
+<!--      @close="siteEditDialog = false"-->
+<!--    />-->
 <!--    <SiteUserDataDialog-->
 <!--      v-if="siteUserDataDialog"-->
 <!--      v-model="siteUserDataDialog"-->

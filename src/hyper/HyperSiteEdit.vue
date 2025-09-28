@@ -118,12 +118,12 @@
                 </v-row>
 
                 <!-- Headers -->
-                <h4 class="mt-4">Headers</h4>
-                <KeyValueEditor v-model="config.search_headers" />
+<!--                <h4 class="mt-4">Headers</h4>-->
+<!--                <KeyValueEditor v-model="config.search_headers" />-->
 
-                <!-- Body -->
-                <h4 class="mt-4">Body (JSON)</h4>
-                <JsonEditor v-model="config.search_body" />
+<!--                &lt;!&ndash; Body &ndash;&gt;-->
+<!--                <h4 class="mt-4">Body (JSON)</h4>-->
+<!--                <JsonEditor v-model="config.search_body" />-->
 
                 <!-- 字段映射 -->
                 <h4 class="mt-4">Field Mappings</h4>
@@ -221,14 +221,13 @@ import {
   HyperSite,
   SiteSearchConfig,
   SiteFieldMapping
-} from '@/hyper/type' // 替换为你的实际路径
+} from '@/hyper/type'
+import api from '@/api' // 替换为你的实际路径
 
-// 假设从 API 获取或作为 props 传入
-const props = defineProps<{
-  initialSite?: HyperSite
-}>()
 
-const router = useRouter()
+
+const route = useRoute()
+const router= useRouter()
 
 // 表单数据
 const site = ref<HyperSite>({
@@ -241,9 +240,10 @@ const site = ref<HyperSite>({
 })
 
 // 初始化数据
-onMounted(() => {
-  if (props.initialSite) {
-    site.value = JSON.parse(JSON.stringify(props.initialSite)) // 深拷贝
+onMounted(async () => {
+  if (route.params.id) {
+    site.value = await api.get(`hyper_site/${route.params.id}`)
+    // site.value = JSON.parse(JSON.stringify(props.initialSite)) // 深拷贝
   } else {
     // 默认新建
     site.value.search_configs = [createEmptySearchConfig()]
@@ -303,13 +303,17 @@ const removeFieldMapping = (config: SiteSearchConfig, index: number) => {
 
 const save = async () => {
   console.log('Saving site:', site.value)
-  // TODO: 调用 API 保存
-  alert('Saved! (Mock)')
-  router.back()
+  const res: { [key: string]: any } =await api.put(`hyper_site/`, site.value)
+
+  console.log(res)
+  if (res.success) {
+    router.back()
+  }else {
+    alert(res.message)
+  }
 }
 
 const cancel = () => {
   router.back()
 }
 </script>
-
