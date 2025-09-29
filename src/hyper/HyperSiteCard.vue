@@ -240,7 +240,7 @@ onMounted(() => {
 
           <!-- 站点名称和特性图标 -->
           <div class="flex-1 min-w-0 flex items-center">
-            <h3 class="text-lg font-semibold leading-tight truncate">{{ cardProps.site?.name }}</h3>
+            <h3 class="text-lg font-semibold leading-tight truncate">{{ cardProps.site?.name }}-New</h3>
 
             <!-- 站点特性图标 -->
             <div class="flex items-center gap-2 ml-auto mr-10">
