@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-card>
-      <v-card-title>Edit HyperSite</v-card-title>
+      <v-card-title>{{pageTitle}}</v-card-title>
       <v-card-text>
         <!-- 基础信息 -->
         <v-form ref="form">
@@ -206,15 +206,17 @@
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn color="secondary" @click="cancel">Cancel</v-btn>
-        <v-btn color="primary" @click="save">Save</v-btn>
+        <v-btn color="primary" @click="save">
+          {{ isEditing ? '更新' : '创建' }}
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import {
   ResponseType,
   SiteStatus,
@@ -222,12 +224,16 @@ import {
   SiteSearchConfig,
   SiteFieldMapping
 } from '@/hyper/type'
-import api from '@/api' // 替换为你的实际路径
-
-
+import api from '@/api'
 
 const route = useRoute()
-const router= useRouter()
+const router = useRouter()
+
+// 判断是新增还是编辑
+const isEditing = computed(() => !!route.params.id)
+
+// 页面标题
+const pageTitle = computed(() => isEditing.value ? '编辑站点' : '新增站点')
 
 // 表单数据
 const site = ref<HyperSite>({
@@ -236,21 +242,14 @@ const site = ref<HyperSite>({
   name: '',
   domain: '',
   status: SiteStatus.ACTIVE,
+  is_public: false,
+  use_proxy: false,
+  encoding: 'UTF-8',
+  description: '',
   search_configs: []
 })
 
-// 初始化数据
-onMounted(async () => {
-  if (route.params.id) {
-    site.value = await api.get(`hyper_site/${route.params.id}`)
-    // site.value = JSON.parse(JSON.stringify(props.initialSite)) // 深拷贝
-  } else {
-    // 默认新建
-    site.value.search_configs = [createEmptySearchConfig()]
-  }
-})
-
-// 枚举映射
+// 枚举选项
 const statusItems = [
   { text: 'Active', value: SiteStatus.ACTIVE },
   { text: 'Inactive', value: SiteStatus.INACTIVE }
@@ -282,14 +281,36 @@ const createEmptyFieldMapping = (): SiteFieldMapping => ({
   is_required: false
 })
 
+// 初始化
+onMounted(async () => {
+  if (isEditing.value) {
+    try {
+      site.value  = await api.get(`hyper_site/${route.params.id}`)
+      // 确保 search_configs 存在
+      if (!site.value.search_configs || site.value.search_configs.length === 0) {
+        site.value.search_configs = [createEmptySearchConfig()]
+      }
+      expandedPanels.value = site.value.search_configs.map((_, i) => i)
+    } catch (err) {
+      alert('加载站点失败')
+      router.back()
+    }
+  } else {
+    // 新建：默认一个空配置
+    site.value.search_configs = [createEmptySearchConfig()]
+  }
+})
+
 // 操作方法
 const addSearchConfig = () => {
-  site.value.search_configs?.push(createEmptySearchConfig())
-  expandedPanels.value.push(site.value.search_configs?.length - 1)
+  site.value.search_configs.push(createEmptySearchConfig())
+  expandedPanels.value.push(site.value.search_configs.length - 1)
 }
 
 const removeSearchConfig = (index: number) => {
-  site.value.search_configs?.splice(index, 1)
+  site.value.search_configs.splice(index, 1)
+  // 更新展开面板索引（可选）
+  expandedPanels.value = expandedPanels.value.filter(i => i !== index).map(i => i > index ? i - 1 : i)
 }
 
 const addFieldMapping = (config: SiteSearchConfig) => {
@@ -302,14 +323,22 @@ const removeFieldMapping = (config: SiteSearchConfig, index: number) => {
 }
 
 const save = async () => {
-  console.log('Saving site:', site.value)
-  const res: { [key: string]: any } =await api.put(`hyper_site/`, site.value)
-
-  console.log(res)
-  if (res.success) {
-    router.back()
-  }else {
-    alert(res.message)
+  try {
+    let res: { [key: string]: any }
+    if (isEditing.value) {
+      res = await api.put(`hyper_site/`, site.value)
+    } else {
+      // 新增用 POST，且不传 id
+      const {id,...payload} = { ...site.value }
+      res = await api.post('hyper_site/', payload)
+    }
+    if (res.success) {
+      router.back()
+    } else {
+      alert(res.message || '操作失败')
+    }
+  } catch (err) {
+    alert('网络错误或保存失败')
   }
 }
 

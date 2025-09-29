@@ -103,6 +103,10 @@ const currentFilter = computed(() => {
   return filterOptions.value.find(option => option.value === filterOption.value)
 })
 
+function toAddPage() {
+  router.push({ name: 'hyper_site_edit'});
+}
+
 // 获取站点列表数据
 async function fetchData() {
   try {
@@ -416,18 +420,10 @@ useDynamicButton({
       fixed
       app
       appear
-      @click="siteAddDialog = true"
+      @click="toAddPage"
       :class="{ 'mb-12': appMode }"
     />
   </Teleport>
-  <!-- 新增站点弹窗 -->
-  <SiteAddEditDialog
-    v-if="siteAddDialog"
-    v-model="siteAddDialog"
-    oper="add"
-    @save="onSiteSave"
-    @close="siteAddDialog = false"
-  />
 
   <!-- 统计信息弹窗 -->
   <SiteStatisticsDialog v-if="siteStatsDialog" v-model="siteStatsDialog" :sites="siteList" />
