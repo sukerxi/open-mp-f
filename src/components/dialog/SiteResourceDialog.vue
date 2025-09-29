@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { Site } from '@/api/types'
 import api from '@/api'
 import type { TorrentInfo, SiteCategory } from '@/api/types'
 import { formatFileSize } from '@core/utils/formatters'
 import AddDownloadDialog from '../dialog/AddDownloadDialog.vue'
 import { useI18n } from 'vue-i18n'
+import { HyperSite } from '@/hyper/type'
 
 // 国际化
 const { t } = useI18n()
 
 // 输入参数
 const props = defineProps({
-  site: Object as PropType<Site>,
+  site: Object as PropType<HyperSite>,
 })
 
 // 关键字
@@ -102,7 +102,7 @@ function addDownloadError(error: string) {
 async function getResourceList() {
   resourceLoading.value = true
   try {
-    resourceDataList.value = await api.get(`site/resource/${props.site?.id}`, {
+    resourceDataList.value = await api.get(`hyper_site/resource/${props.site?.id}`, {
       params: {
         keyword: keyword.value,
         cat: selectCategory.value?.join(','),
@@ -117,7 +117,7 @@ async function getResourceList() {
 // 加载站点分类
 async function getSiteCategoryList() {
   try {
-    siteCategoryList.value = await api.get(`site/category/${props.site?.id}`)
+    siteCategoryList.value = await api.get(`hyper_site/category/${props.site?.id}`)
   } catch (error) {
     console.error(error)
   }

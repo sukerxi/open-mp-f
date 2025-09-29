@@ -379,12 +379,12 @@ onMounted(() => {
 <!--      :site="cardProps.site"-->
 <!--      @close="siteUserDataDialog = false"-->
 <!--    />-->
-<!--    <SiteResourceDialog-->
-<!--      v-if="resourceDialog"-->
-<!--      v-model="resourceDialog"-->
-<!--      :site="cardProps.site"-->
-<!--      @close="onSiteResourceDone"-->
-<!--    />-->
+    <SiteResourceDialog
+      v-if="resourceDialog"
+      v-model="resourceDialog"
+      :site="cardProps.site"
+      @close="onSiteResourceDone"
+    />
   </div>
 </template>
 
