@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <div>
     <v-card>
       <v-card-title>{{pageTitle}}</v-card-title>
       <v-card-text>
@@ -138,25 +138,25 @@
                   <v-row v-for="(mapping, mIndex) in config.field_mappings"
                          :key="mIndex"
                          class="mb-2">
-                    <v-col cols="4">
+                    <v-col cols="12" md="4">
                       <v-text-field
                         v-model="mapping.field_path"
                         :label="`${FIXED_FIELD_NAMES.find(f => f.field_name === mapping.field_name)?.label || mapping.field_name} 路径`"
                       ></v-text-field>
                     </v-col>
-                    <v-col cols="3">
+                    <v-col cols="12" md="3">
                       <v-text-field
                         v-model="mapping.field_attribute"
                         label="Attribute"
                       ></v-text-field>
                     </v-col>
-                    <v-col cols="3">
+                    <v-col cols="12" md="3">
                       <v-text-field
                         v-model="mapping.default_value"
                         label="Default"
                       ></v-text-field>
                     </v-col>
-                    <v-col cols="2" class="d-flex align-center">
+                    <v-col cols="12" md="2" class="d-flex align-center">
                       <v-checkbox
                         v-model="mapping.is_required"
                         label="Required"
@@ -206,7 +206,7 @@
         </v-btn>
       </v-card-actions>
     </v-card>
-  </v-container>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -297,7 +297,7 @@ const createEmptySearchConfig = (): SiteSearchConfig => ({
   search_method: 'GET',
   search_headers: {},
   search_body: {},
-  response_type: ResponseType.HTML,
+  response_type: ResponseType.RSS,
   field_mappings: createFixedFieldMappings()
 })
 

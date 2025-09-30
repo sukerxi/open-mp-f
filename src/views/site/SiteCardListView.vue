@@ -44,9 +44,6 @@ const isRefreshed = ref(false)
 // 是否加载中
 const loading = ref(false)
 
-// 新增站点对话框
-const siteAddDialog = ref(false)
-
 // 统计信息对话框
 const siteStatsDialog = ref(false)
 
@@ -216,11 +213,6 @@ async function handleRefreshStats(domain?: string) {
   }
 }
 
-// 更新站点事件时
-function onSiteSave() {
-  siteAddDialog.value = false
-  fetchData()
-}
 
 // 选择筛选选项
 function selectFilter(value: string) {
@@ -296,7 +288,7 @@ onActivated(() => {
 useDynamicButton({
   icon: 'mdi-web-plus',
   onClick: () => {
-    siteAddDialog.value = true
+    toAddPage()
   },
 })
 </script>

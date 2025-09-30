@@ -77,7 +77,7 @@ async function testSite() {
     testButtonText.value = t('site.testing')
     testButtonDisable.value = true
 
-    const result: { [key: string]: any } = await api.get(`site/test/${cardProps.site?.id}`)
+    const result: { [key: string]: any } = await api.get(`hyper_site/test/${cardProps.site?.id}`)
     if (result.success) $toast.success(t('site.testSuccess', { name: cardProps.site?.name }))
     else $toast.error(t('site.testFailed', { name: cardProps.site?.name, message: result.message }))
 
