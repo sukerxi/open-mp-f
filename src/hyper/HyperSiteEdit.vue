@@ -32,9 +32,9 @@
             </v-col>
             <v-col cols="12" md="6">
               <v-select
-                v-model="site.status"
-                :items="statusItems"
-                label="Status *"
+                v-model="site.protocol"
+                :items="protocolItems"
+                label="协议 *"
                 item-title="text"
                 item-value="value"
               ></v-select>
@@ -42,21 +42,28 @@
           </v-row>
 
           <v-row>
-            <v-col cols="12" md="4">
+            <v-col cols="12" md="3">
+              <v-switch
+                v-model="isActive"
+                label="启用"
+                inset
+              ></v-switch>
+            </v-col>
+            <v-col cols="12" md="3">
               <v-switch
                 v-model="site.is_public"
                 label="公共"
                 inset
               ></v-switch>
             </v-col>
-            <v-col cols="12" md="4">
+            <v-col cols="12" md="3">
               <v-switch
                 v-model="site.use_proxy"
                 label="使用代理"
                 inset
               ></v-switch>
             </v-col>
-            <v-col cols="12" md="4">
+            <v-col cols="12" md="3">
               <v-text-field
                 v-model="site.encoding"
                 label="编码 (例 UTF-8)"
@@ -126,69 +133,57 @@
 <!--                <JsonEditor v-model="config.search_body" />-->
 
                 <!-- 字段映射 -->
-                <h4 class="mt-4">Field Mappings</h4>
-                <v-list>
-                  <v-list-item
-                    v-for="(mapping, mIndex) in config.field_mappings"
-                    :key="mIndex"
-                    class="mb-2"
-                  >
-                    <v-row>
-                      <v-col cols="3">
-                        <v-text-field
-                          v-model="mapping.field_name"
-                          label="Field Name"
-                          density="compact"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="3">
-                        <v-text-field
-                          v-model="mapping.field_path"
-                          label="Field Path"
-                          density="compact"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="2">
-                        <v-text-field
-                          v-model="mapping.field_attribute"
-                          label="Attribute"
-                          density="compact"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="2">
-                        <v-text-field
-                          v-model="mapping.default_value"
-                          label="Default"
-                          density="compact"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="1" class="d-flex align-center">
-                        <v-checkbox
-                          v-model="mapping.is_required"
-                          label="Required"
-                          density="compact"
-                        ></v-checkbox>
-                      </v-col>
-                      <v-col cols="1" class="d-flex align-center">
-                        <v-btn
-                          icon="mdi-delete"
-                          size="small"
-                          color="error"
-                          @click="removeFieldMapping(config, mIndex)"
-                        ></v-btn>
-                      </v-col>
-                    </v-row>
-                  </v-list-item>
-                </v-list>
+                <v-label class="mt-4 mb-2">Field Mappings</v-label>
+                <v-form>
+                  <v-row v-for="(mapping, mIndex) in config.field_mappings"
+                         :key="mIndex"
+                         class="mb-2">
+                    <v-col cols="4">
+                      <v-text-field
+                        v-model="mapping.field_path"
+                        :label="`${FIXED_FIELD_NAMES.find(f => f.field_name === mapping.field_name)?.label || mapping.field_name} 路径`"
+                      ></v-text-field>
+                    </v-col>
+                    <v-col cols="3">
+                      <v-text-field
+                        v-model="mapping.field_attribute"
+                        label="Attribute"
+                      ></v-text-field>
+                    </v-col>
+                    <v-col cols="3">
+                      <v-text-field
+                        v-model="mapping.default_value"
+                        label="Default"
+                      ></v-text-field>
+                    </v-col>
+                    <v-col cols="2" class="d-flex align-center">
+                      <v-checkbox
+                        v-model="mapping.is_required"
+                        label="Required"
+                      ></v-checkbox>
+                    </v-col>
+                    <!--                      <v-col cols="1" class="d-flex align-center">-->
+                    <!--                        <v-btn-->
+                    <!--                          icon="mdi-delete"-->
+                    <!--                          size="small"-->
+                    <!--                          color="error"-->
+                    <!--                          @click="removeFieldMapping(config, mIndex)"-->
+                    <!--                        ></v-btn>-->
+                    <!--                      </v-col>-->
+                  </v-row>
+                </v-form>
 
-                <v-btn
-                  size="small"
-                  prepend-icon="mdi-plus"
-                  color="primary"
-                  @click="addFieldMapping(config)"
-                >
-                  Add Field Mapping
-                </v-btn>
+
+
+
+<!--                <v-btn-->
+<!--                  size="small"-->
+<!--                  prepend-icon="mdi-plus"-->
+<!--                  color="primary"-->
+<!--                  @click="addFieldMapping(config)"-->
+<!--                >-->
+<!--                  Add Field Mapping-->
+<!--                </v-btn>-->
               </v-expansion-panel-text>
             </v-expansion-panel>
           </v-expansion-panels>
@@ -222,7 +217,7 @@ import {
   SiteStatus,
   HyperSite,
   SiteSearchConfig,
-  SiteFieldMapping
+  SiteFieldMapping, Protocol,
 } from '@/hyper/type'
 import api from '@/api'
 
@@ -235,6 +230,10 @@ const isEditing = computed(() => !!route.params.id)
 // 页面标题
 const pageTitle = computed(() => isEditing.value ? '编辑站点' : '新增站点')
 
+const protocolItems = [
+  { text: 'HTTP', value: Protocol.HTTP },
+  { text: 'HTTPS', value: Protocol.HTTPS }
+]
 // 表单数据
 const site = ref<HyperSite>({
   id: 0,
@@ -242,24 +241,53 @@ const site = ref<HyperSite>({
   name: '',
   domain: '',
   status: SiteStatus.ACTIVE,
-  is_public: false,
+  protocol: protocolItems[0].value,
+  is_public: true,
   use_proxy: false,
   encoding: 'UTF-8',
   description: '',
   search_configs: []
 })
 
-// 枚举选项
-const statusItems = [
-  { text: 'Active', value: SiteStatus.ACTIVE },
-  { text: 'Inactive', value: SiteStatus.INACTIVE }
-]
-
 const responseTypeItems = [
-  { text: 'HTML', value: ResponseType.HTML },
   { text: 'RSS', value: ResponseType.RSS },
+  { text: 'HTML', value: ResponseType.HTML },
   { text: 'JSON', value: ResponseType.JSON }
 ]
+// 默认 XPath 映射
+const DEFAULT_FIELD_PATHS: Record<string, string> = {
+  item_list: '//channel//item',
+  id: './/guid/text()',
+  download: './/enclosure/@url',
+  date_added: './/pubDate/text()',
+  size: './/enclosure/@length',
+  description: './/description/text()',
+  detail_url: './/link/text()',
+  title: './/title/text()',
+}
+// 固定字段映射模板（不可增删）
+const FIXED_FIELD_NAMES = [
+  { field_name: 'item_list', label: '列表' },
+  { field_name: 'id', label: 'id' },
+  { field_name: 'title', label: '标题' },
+  { field_name: 'detail_url', label: '详情连接' },
+  { field_name: 'size', label: '文件大小' },
+  { field_name: 'date_added', label: '发布时间' },
+  { field_name: 'download', label: '下载链接' },
+  { field_name: 'description', label: '描述' },
+
+  // 可根据实际需求增减
+]
+// 生成固定结构的 field_mappings，带默认路径
+const createFixedFieldMappings = (): SiteFieldMapping[] => {
+  return FIXED_FIELD_NAMES.map(({ field_name }) => ({
+    field_name,
+    field_path: DEFAULT_FIELD_PATHS[field_name] || '',
+    field_attribute: '',
+    default_value: '',
+    is_required: true
+  }))
+}
 
 const expandedPanels = ref<number[]>([0])
 
@@ -270,7 +298,7 @@ const createEmptySearchConfig = (): SiteSearchConfig => ({
   search_headers: {},
   search_body: {},
   response_type: ResponseType.HTML,
-  field_mappings: []
+  field_mappings: createFixedFieldMappings()
 })
 
 const createEmptyFieldMapping = (): SiteFieldMapping => ({
@@ -281,13 +309,34 @@ const createEmptyFieldMapping = (): SiteFieldMapping => ({
   is_required: false
 })
 
+const isActive = computed({
+  get: () => site.value.status === SiteStatus.ACTIVE,
+  set: (val) => {
+    site.value.status = val ? 1 : 2;
+  }
+});
+
+
 // 初始化
 onMounted(async () => {
   if (isEditing.value) {
     try {
       site.value  = await api.get(`hyper_site/${route.params.id}`)
-      // 确保 search_configs 存在
-      if (!site.value.search_configs || site.value.search_configs.length === 0) {
+      // 确保每个 search_config 使用固定字段结构，并合并后端数据
+      site.value.search_configs = site.value.search_configs.map(config => {
+        const fixedMappings = createFixedFieldMappings()
+        const backendMappings = config.field_mappings || []
+
+        // 将后端返回的映射按 field_name 合并到固定结构中
+        const mergedMappings = fixedMappings.map(fixed => {
+          const matched = backendMappings.find(b => b.field_name === fixed.field_name)
+          return matched ? { ...fixed, ...matched } : fixed
+        })
+
+        return { ...config, field_mappings: mergedMappings }
+      })
+
+      if (site.value.search_configs.length === 0) {
         site.value.search_configs = [createEmptySearchConfig()]
       }
       expandedPanels.value = site.value.search_configs.map((_, i) => i)
@@ -295,7 +344,7 @@ onMounted(async () => {
       alert('加载站点失败')
       router.back()
     }
-  } else {
+  }else {
     // 新建：默认一个空配置
     site.value.search_configs = [createEmptySearchConfig()]
   }
@@ -326,10 +375,11 @@ const save = async () => {
   try {
     let res: { [key: string]: any }
     if (isEditing.value) {
-      res = await api.put(`hyper_site/`, site.value)
+      const {created_at,updated_at,...payload} = { ...site.value }
+      res = await api.put(`hyper_site/`, payload)
     } else {
       // 新增用 POST，且不传 id
-      const {id,...payload} = { ...site.value }
+      const {id,created_at,updated_at,...payload} = { ...site.value }
       res = await api.post('hyper_site/', payload)
     }
     if (res.success) {

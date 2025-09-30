@@ -198,18 +198,7 @@ function getSiteStats(domain: string) {
   return siteStatsList.value[domain] || {}
 }
 
-// 查看媒体详情
-function viewMediaDetail() {
-  router.push({
-    path: '/site_edit',
-    query: {
-      mediaid: getMediaId(),
-      title: props.media?.name,
-      year: props.media?.year,
-      type: props.media?.type,
-    },
-  })
-}
+
 
 // 处理站点统计数据刷新请求
 async function handleRefreshStats(domain?: string) {

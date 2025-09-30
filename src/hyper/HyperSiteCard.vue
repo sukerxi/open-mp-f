@@ -127,7 +127,7 @@ async function deleteSiteInfo() {
   if (!isConfirmed) return
 
   try {
-    const result: { [key: string]: any } = await api.delete(`site/${cardProps.site?.id}`)
+    const result: { [key: string]: any } = await api.delete(`hyper_site/${cardProps.site?.id}`)
     if (result.success) emit('remove')
     else $toast.error(t('site.deleteFailed', { name: cardProps.site?.name, message: result.message }))
   } catch (error) {

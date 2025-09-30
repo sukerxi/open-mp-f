@@ -9,6 +9,12 @@ enum SiteStatus {
   ACTIVE = 1,
   INACTIVE = 2
 }
+enum Protocol {
+  HTTP = 'http',
+  HTTPS = 'https',
+}
+
+
 
 // Interfaces
 interface HyperSite {
@@ -20,6 +26,7 @@ interface HyperSite {
   is_public?: boolean;
   use_proxy?: boolean;
   status: SiteStatus; // 可考虑用 SiteStatus 枚举类型
+  protocol: Protocol;
   description?: string;
   created_at?: string; // ISO 8601 datetime string
   updated_at?: string;
@@ -54,6 +61,7 @@ interface SiteFieldMapping {
 export  {
   ResponseType,
   SiteStatus,
+  Protocol,
 }
 export type {
   HyperSite,
