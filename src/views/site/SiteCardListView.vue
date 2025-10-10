@@ -3,6 +3,7 @@ import draggable from 'vuedraggable'
 import api from '@/api'
 import type { Site, SiteUserData } from '@/api/types'
 import SiteCard from '@/components/cards/SiteCard.vue'
+import HyperSiteCard from '@/hyper/HyperSiteCard.vue'
 import NoDataFound from '@/components/NoDataFound.vue'
 import SiteAddEditDialog from '@/components/dialog/SiteAddEditDialog.vue'
 import SiteStatisticsDialog from '@/components/dialog/SiteStatisticsDialog.vue'
@@ -12,6 +13,7 @@ import { useDynamicButton } from '@/composables/useDynamicButton'
 import { useI18n } from 'vue-i18n'
 import { usePWA } from '@/composables/usePWA'
 import { useToast } from 'vue-toastification'
+import router from '@/router'
 
 // 国际化
 const { t } = useI18n()
@@ -41,9 +43,6 @@ const isRefreshed = ref(false)
 
 // 是否加载中
 const loading = ref(false)
-
-// 新增站点对话框
-const siteAddDialog = ref(false)
 
 // 统计信息对话框
 const siteStatsDialog = ref(false)
@@ -101,11 +100,15 @@ const currentFilter = computed(() => {
   return filterOptions.value.find(option => option.value === filterOption.value)
 })
 
+function toAddPage() {
+  router.push({ name: 'hyper_site_edit'});
+}
+
 // 获取站点列表数据
 async function fetchData() {
   try {
     loading.value = true
-    siteList.value = await api.get('site/')
+    siteList.value = await api.get('hyper_site/')
     loading.value = false
     isRefreshed.value = true
     // 获取站点列表后，获取统计数据
@@ -192,6 +195,8 @@ function getSiteStats(domain: string) {
   return siteStatsList.value[domain] || {}
 }
 
+
+
 // 处理站点统计数据刷新请求
 async function handleRefreshStats(domain?: string) {
   if (domain) {
@@ -208,11 +213,6 @@ async function handleRefreshStats(domain?: string) {
   }
 }
 
-// 更新站点事件时
-function onSiteSave() {
-  siteAddDialog.value = false
-  fetchData()
-}
 
 // 选择筛选选项
 function selectFilter(value: string) {
@@ -288,7 +288,7 @@ onActivated(() => {
 useDynamicButton({
   icon: 'mdi-web-plus',
   onClick: () => {
-    siteAddDialog.value = true
+    toAddPage()
   },
 })
 </script>
@@ -374,7 +374,7 @@ useDynamicButton({
       :disabled="filterOption !== 'all'"
     >
       <template #item="{ element }">
-        <SiteCard
+        <HyperSiteCard
           :site="element"
           :data="getUserData(element.domain)"
           :stats="getSiteStats(element.domain)"
@@ -401,18 +401,10 @@ useDynamicButton({
       fixed
       app
       appear
-      @click="siteAddDialog = true"
+      @click="toAddPage"
       :class="{ 'mb-12': appMode }"
     />
   </Teleport>
-  <!-- 新增站点弹窗 -->
-  <SiteAddEditDialog
-    v-if="siteAddDialog"
-    v-model="siteAddDialog"
-    oper="add"
-    @save="onSiteSave"
-    @close="siteAddDialog = false"
-  />
 
   <!-- 统计信息弹窗 -->
   <SiteStatisticsDialog v-if="siteStatsDialog" v-model="siteStatsDialog" :sites="siteList" />
